@@ -36,25 +36,24 @@ public class SecureServer {
         while(true) {
             try(Socket socket = (SSLSocket) serverSocket.accept();
                 ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-                ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
-                Scanner sc = new Scanner(System.in)) {
+                ObjectInputStream in = new ObjectInputStream(socket.getInputStream())) {
 
                 System.out.println("Cliente conectoado de forma segura");
 
-                //lee el objeto serializado
-                Object receivedObj= in.readObject();
-                if(receivedObj instanceof Mensaje) {
-                    Mensaje mensaje = (Mensaje) receivedObj;
-                    System.out.println("Objeto recibido: " + mensaje);
-                    out.writeObject("Objeto recibido correctamente en el servidor.");
-                }else{
-                    System.out.println("Objeto recibido no es del tipo esperado🤨");
+                while(true) {
+                    Object obj = in.readObject();
+                    if(obj instanceof Mensaje) {
+                        Mensaje mensaje = (Mensaje) obj;
+                        System.out.println("Objeto recibido: "+mensaje);
+                        
+                        if(mensaje.getContenido().equalsIgnoreCase("Cliente se ha desconectado.")){
+                            System.out.println("El cliente se ha desconectado.");
+                            break;
+                        }
+
+                        out.writeObject("Servidor recibió correctamente");
+                    }
                 }
-
-                /*Object receivedObject = in.readObject();
-                System.out.println("Objeto recibido: " + receivedObject.toString());
-
-                out.writeObject("Objeto recibido con exito.");*/
 
             }
         }
