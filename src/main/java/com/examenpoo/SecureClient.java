@@ -6,7 +6,7 @@ import java.io.*;
 public class SecureClient {
 
     private static final String HOST = "localhost";
-    private static final int PORT = 5000;
+    private static final int PORT = 5050;
 
     public static void main(String[] args)  throws Exception {
         System.setProperty("javax.net.ssl.trustStore", "server.keystore");
@@ -20,7 +20,11 @@ public class SecureClient {
 
             System.out.println("Conexion segura establecida con el servidor.");
 
-            out.writeObject("Hola desde el cliente🫡");
+            //enviando mensaje serializado
+            Mensaje mensaje = new Mensaje("Hola desde el cliente jeje", "🫡");
+            out.writeObject(mensaje);
+
+            //out.writeObject("Hola desde el cliente🫡");
             System.out.println("Objeto enviado.");
 
             Object response = in.readObject();

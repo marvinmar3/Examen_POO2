@@ -6,14 +6,19 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.KeyStore;
+import java.util.Scanner;
+
+import com.examenpoo.Mensaje;
+
 
 public class SecureServer {
 
-    public static final int PORT= 5000;
+    private static final int PORT = 5050;
+
 
     public static void main(String[] args) throws Exception {
         KeyStore keyStore = KeyStore.getInstance("PKCS12");
-        try(FileInputStream fis = new FileInputStream("server.jks")) {
+        try(FileInputStream fis = new FileInputStream("server.keystore")) {
             keyStore.load(fis, "contrasena123".toCharArray());
         }
 
@@ -31,14 +36,25 @@ public class SecureServer {
         while(true) {
             try(Socket socket = (SSLSocket) serverSocket.accept();
                 ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-                ObjectInputStream in = new ObjectInputStream(socket.getInputStream())) {
+                ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+                Scanner sc = new Scanner(System.in)) {
 
                 System.out.println("Cliente conectoado de forma segura");
 
-                Object receivedObject = in.readObject();
+                //lee el objeto serializado
+                Object receivedObj= in.readObject();
+                if(receivedObj instanceof Mensaje) {
+                    Mensaje mensaje = (Mensaje) receivedObj;
+                    System.out.println("Objeto recibido: " + mensaje);
+                    out.writeObject("Objeto recibido correctamente en el servidor.");
+                }else{
+                    System.out.println("Objeto recibido no es del tipo esperado🤨");
+                }
+
+                /*Object receivedObject = in.readObject();
                 System.out.println("Objeto recibido: " + receivedObject.toString());
 
-                out.writeObject("Objeto recibido con exito.");
+                out.writeObject("Objeto recibido con exito.");*/
 
             }
         }
